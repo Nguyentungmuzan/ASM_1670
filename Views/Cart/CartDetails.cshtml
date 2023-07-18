@@ -1,0 +1,90 @@
+﻿@model ASM_2_1670.Models.Cart
+
+@{
+    ViewData["Title"] = "Cart Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<input type="hidden" id="cart-quantity" value="@ViewBag.CartQuantity" />
+
+<div class="container">
+    <h1 class="text-center">Cart Details</h1>
+
+    @if (Model.CartDetails.Count == 0)
+    {
+        <div class="text-center">
+            <p>Your cart is empty.</p>
+            <a href="@Url.Action("Index", "Product")" class="btn btn-primary">Continue Shopping</a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-8">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.CartDetails)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="media">
+                                        <img src="@item.Products.ImageURL" class="mr-3" alt="Product Image" width="64" height="64">
+                                        <div class="media-body">
+                                            <h5 class="mt-0">@item.Products.ProductName</h5>
+                                            <p>@item.Products.ShortDescription</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>@item.Quantity</td>
+                                <td>$@item.Products.Price</td>
+                                <td>$@(item.Quantity * item.Products.Price)</td>
+                                <td>
+                                    <form method="post" action="@Url.Action("UpdateQuantity", "Cart")">
+                                        <input type="hidden" name="productId" value="@item.ProductID" />
+                                        <input type="number" name="quantity" value="@item.Quantity" min="1" />
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form method="post" action="@Url.Action("RemoveFromCart", "Cart")">
+                                        <input type="hidden" name="productId" value="@item.ProductID" />
+                                        <button type="submit" class="btn btn-danger">Remove</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Summary</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Total Quantity
+                                <span class="badge badge-primary badge-pill">@Model.CartDetails.Sum(cd => cd.Quantity)</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Total Price
+                                <span class="badge badge-primary badge-pill">$@Model.CartDetails.Sum(cd => cd.Quantity * cd.Products.Price)</span>
+                            </li>
+                        </ul>
+                        <a href="@Url.Action("Index", "Product")" class="btn btn-primary btn-block mt-3">Continue Shopping</a>
+                        <a href="@Url.Action("Index", "Checkout")" class="btn btn-success btn-block mt-3">Checkout</a>
+                        <!-- Add any additional actions or buttons here, such as "Checkout" -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
